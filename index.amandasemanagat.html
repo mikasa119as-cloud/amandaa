@@ -212,7 +212,7 @@ clip-path:polygon(0 1.5%,5% 0,20% 1%,40% 0,60% 1.2%,82% 0,100% 1%,100% 99%,85% 1
 <circle cx="130" cy="128" r="2.6" fill="#59604f"/><circle cx="213" cy="126" r="2.6" fill="#59604f"/><circle cx="300" cy="119" r="2.6" fill="#59604f"/><circle cx="440" cy="126" r="2.6" fill="#59604f"/>
 <path class="rt" d="M130 128Q148 140 160 164" fill="none" stroke="#b87c86" stroke-width="2"/>
 <circle class="pr" cx="160" cy="165" r="6"/><circle class="pr" style="animation-delay:1s" cx="160" cy="165" r="6"/></svg>
-<button class="pin" style="left:26.7%;top:48%" data-t="Bandung, Jawa Barat" data-d="Semoga setiap langkahmu hari ini dimudahkan dan penuh keberkahan."><span class="th"><img id="pth" alt="" style="width:100%;height:100%;object-fit:cover;object-position:50% 50%"></span><span class="tip"></span></button>
+<button class="pin" style="left:26.7%;top:48%" data-t="Bandung, Jawa Barat" data-d="Semoga setiap langkahmu hari ini dimudahkan dan penuh keberkahan."><span class="th"><img id="pth" alt="" style="width:100%;height:100%;object-fit:cover;object-position:50% 45%;transform:scale(3.4);transform-origin:58% 45%"></span><span class="tip"></span></button>
 <button class="pin" style="left:18.3%;top:44%" data-t="Jaga kesehatan" data-d="Cuaca lagi sering hujan, jangan lupa istirahat yang cukup ya."><span class="dot"></span></button>
 </div>
 <div id="pop"><h4 id="pt"></h4><span id="pd"></span><button id="px" aria-label="Tutup">✕</button></div></div>
@@ -250,19 +250,26 @@ clip-path:polygon(0 1.5%,5% 0,20% 1%,40% 0,60% 1.2%,82% 0,100% 1%,100% 99%,85% 1
 <button id="help" type="button">Help</button>
 <div id="toast"></div>
 <div id="modal"><div class="b"><h3>Panduan &amp; kustomisasi</h3>
-<ul style="padding-left:18px;margin:0 0 10px"><li>Ketuk layar pembuka untuk menyalakan lilin.</li><li>Gosok kartu “Scratch me”; tombol “Ganti foto” memasang fotomu sendiri.</li><li>Klik pin di peta, atau putar voice note.</li></ul>
+<ul style="padding-left:18px;margin:0 0 10px"><li>Ketuk layar pembuka untuk menyalakan lilin.</li><li>Gosok kartu “Scratch me” untuk membuka foto.</li><li>Klik pin di peta, atau putar voice note.</li></ul>
+<label>Foto (pilih 3, urut 1-2-3)<input id="pf" type="file" accept="image/*" multiple></label><label>Lagu (mp3)<input id="pm" type="file" accept="audio/*"></label>
 <label>Pengirim<input id="inf" placeholder="Zaky"></label><label>Penerima<input id="int" placeholder="Amanda"></label>
 <div class="r"><button class="l" id="rp" type="button">Ulangi intro</button><span><button class="l" id="cl" type="button" style="margin-right:10px">Tutup</button><button id="sv" type="button">Simpan nama</button></span></div></div></div>
 
-<audio id="au" preload="auto" src="LINK_LAGU_DAYLIGHT.mp3"></audio>
+<audio id="au" preload="auto"></audio>
 <script>
 const $=id=>document.getElementById(id);const au=$("au");
 /* ---------- audio ---------- */
 let AC=null;const ac=()=>{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC};
 function tone(f,t0,d,v,type){try{const c=ac(),o=c.createOscillator(),g=c.createGain();o.type=type||'sine';o.frequency.value=f;const s=c.currentTime+t0;
 g.gain.setValueAtTime(.001,s);g.gain.exponentialRampToValueAtTime(v,s+.03);g.gain.exponentialRampToValueAtTime(.0001,s+d);o.connect(g);g.connect(c.destination);o.start(s);o.stop(s+d+.05)}catch(e){}}
-/* ---------- photos ---------- */
-const PH=['FOTO_1.jpg','FOTO_2.jpg','FOTO_3.jpg'];['im1','im2','im3'].forEach((id,i)=>{$(id).src=PH[i]});$('pth').src='FOTO_4.jpg';
+/* ---------- foto & lagu (nama file sama dengan unggahanmu) ---------- */
+const FOTO=['FOTO_1_jpg.jpeg','FOTO_2_jpg.jpeg','FOTO_3_jpg.jpeg'],LAGU='LINK_LAGU_DAYLIGHT_mp3.mp3';
+const svgURI=s=>'data:image/svg+xml;utf8,'+encodeURIComponent(s);
+const fb=i=>svgURI('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#'+['f3c9a8','9ec4d8','b9d7b0'][i]+'"/><stop offset="1" stop-color="#6f8a6a"/></linearGradient></defs><rect width="400" height="500" fill="url(#g)"/><text x="200" y="260" text-anchor="middle" font-size="28" fill="#fff" font-family="Georgia">Foto '+(i+1)+'</text></svg>');
+let PH=FOTO.slice();
+function setImg(e,s,i){e.onerror=()=>{e.onerror=null;e.src=fb(i)};e.src=s}
+function setPhotos(a){PH=a;['im1','im2','im3'].forEach((id,i)=>setImg($(id),a[i],i));setImg($('pth'),a[1],1);document.querySelectorAll('.ss').forEach((e,i)=>setImg(e,a[i],i))}
+setPhotos(PH);au.src=LAGU;
 /* ---------- intro ---------- */
 const order=['L3','L1','L2','L4','L5'],notes=[523.25,587.33,659.25,783.99,1046.5];let run=false;
 function start(){if(run)return;run=true;$('hint').textContent='Lighting the candles…';
@@ -272,7 +279,7 @@ setTimeout(()=>{const n=$('intro');n.style.opacity=0;n.style.visibility='hidden'
 setTimeout(()=>$('burst').classList.remove('go'),1700)},order.length*450+1500)}
 $('intro').onclick=start;$('intro').onkeydown=e=>{if(e.key==='Enter'||e.key===' ')start()};
 /* ---------- video (slideshow foto) ---------- */
-setTimeout(()=>{const v=$('vbox');v.innerHTML=PH.map((s,i)=>`<img src="${s}" class="ss${i?'':' on'}" alt="">`).join('');const im=v.querySelectorAll('img');let k=0;setInterval(()=>{im[k].classList.remove('on');k=(k+1)%im.length;im[k].classList.add('on')},3500)},1800);
+setTimeout(()=>{const v=$('vbox');v.innerHTML=PH.map((s,i)=>`<img class="ss${i?'':' on'}" alt="">`).join('');setPhotos(PH);const im=v.querySelectorAll('img');let k=0;setInterval(()=>{im[k].classList.remove('on');k=(k+1)%im.length;im[k].classList.add('on')},3500)},1800);
 /* ---------- map ---------- */
 let sc=1;const mc=$('mc');
 $('zi').onclick=()=>{sc=Math.min(2.2,sc+.3);mc.style.transform=`scale(${sc})`};$('zo').onclick=()=>{sc=Math.max(1,sc-.3);mc.style.transform=`scale(${sc})`};
@@ -298,7 +305,7 @@ function sStop(){sOn=false;clearInterval(sI);au.pause();$('spi').setAttribute('d
 $('vpb').onclick=()=>{if(vOn)return vStop();sStop();vOn=true;$('vpi').setAttribute('d',PAUSE);$('vn').classList.add('pl');
 if('speechSynthesis' in window){const u=new SpeechSynthesisUtterance("Hai "+$('lt').textContent+", semangat terus ya kerjanya! Aku doakan semoga setiap langkahmu hari ini dimudahkan dan penuh keberkahan. Btw, cuaca lagi sering hujan nih, jangan lupa jaga kesehatan dan istirahat yang cukup ya, "+$('lt').textContent+".");u.lang="id-ID";u.rate=.95;speechSynthesis.speak(u)}
 let e=0;const bs=wf.querySelectorAll('i');vI=setInterval(()=>{e++;$('tm').textContent='0:'+String(Math.max(0,20-e)).padStart(2,'0');const n=Math.floor(e/20*bs.length);bs.forEach((b,i)=>{if(i<=n)b.classList.add('a')});if(e>=20)vStop()},1000)};
-$('spb').onclick=()=>{if(sOn)return sStop();vStop();sOn=true;$('spi').setAttribute('d',PAUSE);au.play().catch(()=>sStop())};au.onended=sStop;
+$('spb').onclick=()=>{if(sOn)return sStop();vStop();sOn=true;$('spi').setAttribute('d',PAUSE);au.play().catch(()=>{sStop();toast('Lagu belum ada — pilih file lagu di Help')})};au.onended=sStop;
 /* ---------- help / toast ---------- */
 function toast(m){const t=$('toast');t.textContent=m;t.style.opacity=1;setTimeout(()=>t.style.opacity=0,2200)}
 $('help').onclick=()=>$('modal').style.display='grid';$('cl').onclick=()=>$('modal').style.display='none';
@@ -309,6 +316,8 @@ if(t){$('lt').textContent=t;$('ls').textContent='Dear '+t+','}
 $('modal').style.display='none';toast('Surat diperbarui')};
 $('rp').onclick=()=>{$('modal').style.display='none';run=false;order.forEach(i=>$(i).classList.remove('on'));$('hint').textContent='Tap to light the candles';
 $('main').classList.remove('show');const n=$('intro');n.style.visibility='visible';n.style.opacity=1;scrollTo({top:0})};
+$('pf').onchange=e=>{const f=[...e.target.files].slice(0,3);if(!f.length)return;const a=PH.slice();f.forEach((x,i)=>a[i]=URL.createObjectURL(x));setPhotos(a);toast('Foto diperbarui')};
+$('pm').onchange=e=>{const f=e.target.files[0];if(!f)return;au.src=URL.createObjectURL(f);au.load();toast('Lagu diganti')};
 
 /* ---- fx ---- */
 document.querySelectorAll('.wrap>section').forEach(s=>{if(!s.classList.contains('tri'))s.classList.add('rv')});
